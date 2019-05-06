@@ -32,6 +32,7 @@
 #include "nm-utils-private.h"
 #include "nm-core-internal.h"
 #include "nm-core-tests-enum-types.h"
+#include "nm-team-utils.h"
 
 #include "nm-setting-8021x.h"
 #include "nm-setting-adsl.h"
@@ -6807,7 +6808,16 @@ _team_config_equal_check (const char *conf1,
                           gboolean port_config,
                           gboolean expected)
 {
-	g_assert_cmpint (_nm_utils_team_config_equal (conf1, conf2, port_config), ==, expected);
+	nm_auto_free_team_setting NMTeamSetting *team_a = NULL;
+	nm_auto_free_team_setting NMTeamSetting *team_b = NULL;
+	gboolean is_same;
+
+	team_a = nm_team_setting_new (port_config, conf1);
+	team_b = nm_team_setting_new (port_config, conf2);
+
+	is_same = (nm_team_setting_cmp (team_a, team_b, TRUE) == 0);
+
+	g_assert_cmpint (is_same, ==, expected);
 }
 
 static void
