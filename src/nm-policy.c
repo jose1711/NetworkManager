@@ -2025,6 +2025,20 @@ device_ip_config_changed (NMDevice *device,
 /*****************************************************************************/
 
 static void
+device_real_changed (NMDevice *device,
+                     GParamSpec *pspec,
+                     gpointer user_data)
+{
+	NMPolicyPrivate *priv = user_data;
+	NMPolicy *self = _PRIV_TO_SELF (priv);
+
+	if (nm_device_is_real (device)) {
+		nm_log_err (LOGD_CORE, " ---- policy device %s realized", nm_device_get_iface (device));
+		schedule_activate_all (self);
+	}
+}
+
+static void
 device_autoconnect_changed (NMDevice *device,
                             GParamSpec *pspec,
                             gpointer user_data)
@@ -2064,6 +2078,7 @@ devices_list_register (NMPolicy *self, NMDevice *device)
 	g_signal_connect       (device, NM_DEVICE_IP6_PREFIX_DELEGATED,   (GCallback) device_ip6_prefix_delegated, priv);
 	g_signal_connect       (device, NM_DEVICE_IP6_SUBNET_NEEDED,      (GCallback) device_ip6_subnet_needed, priv);
 	g_signal_connect       (device, "notify::" NM_DEVICE_AUTOCONNECT, (GCallback) device_autoconnect_changed, priv);
+	g_signal_connect       (device, "notify::" NM_DEVICE_REAL,        (GCallback) device_real_changed, priv);
 	g_signal_connect       (device, NM_DEVICE_RECHECK_AUTO_ACTIVATE,  (GCallback) device_recheck_auto_activate, priv);
 }
 

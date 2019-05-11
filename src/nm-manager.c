@@ -1995,6 +1995,8 @@ system_create_virtual_device (NMManager *self, NMConnection *connection)
 		g_object_unref (device);
 	}
 
+	return device;
+
 	if (!nm_device_check_unrealized_device_managed (device)) {
 		_LOG3D (LOGD_DEVICE, connection,
 		        "skip activation because virtual device '%s' is unmanaged",
